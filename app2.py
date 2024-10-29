@@ -226,9 +226,7 @@ with tabs[2]:
             else:
                 st.write("No se encontraron datos para los ETFs seleccionados en el periodo elegido.")
 
-streamlit==1.37.1
-yfinance==0.2.44
-plotly
+
 
 
 
