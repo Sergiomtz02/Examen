@@ -104,8 +104,6 @@ with tabs[1]:
         st.write(f"- **Nacionalidad**: {st.session_state.nacionalidad_cliente}")
         st.write(f"- **Ocupación**: {st.session_state.ocupacion_cliente}")
 
-
-
     st.write("Analiza el rendimiento y riesgo de múltiples ETFs en periodos específicos.")
     
     etfs_seleccionados = st.multiselect("Selecciona ETFs para comparar:", [etf['nombre'] for etf in ETFs_Data])
@@ -114,8 +112,12 @@ with tabs[1]:
     periodo = periodos[periodo_seleccionado]
     monto_invertir = st.number_input("Monto a invertir por ETF (USD):", min_value=0.0, step=1.0)
 
+    # Nuevos campos para definir porcentajes optimista y pesimista
+    porcentaje_optimista = st.number_input("Porcentaje de Rendimiento Optimista (%):", value=20, step=1)
+    porcentaje_pesimista = st.number_input("Porcentaje de Rendimiento Pesimista (%):", value=20, step=1)
+
     st.header("ETFS")
-            # Mostrar tabla con descripciones de los ETFs seleccionados
+    # Mostrar tabla con descripciones de los ETFs seleccionados
     if etfs_seleccionados:
         descripciones_df = pd.DataFrame({
             "Nombre del ETF": [etf["nombre"] for etf in ETFs_Data if etf["nombre"] in etfs_seleccionados],
@@ -123,8 +125,6 @@ with tabs[1]:
         })
         st.write("### Descripción de los ETFs Seleccionados")
         st.table(descripciones_df)
-
-
 
 # Función para calcular rendimiento y riesgo
 def calcular_rendimiento_riesgo(etf_symbol, period):
@@ -137,9 +137,9 @@ def calcular_rendimiento_riesgo(etf_symbol, period):
     retornos_diarios = data['Close'].pct_change().dropna()
     volatilidad = retornos_diarios.std() * (252 ** 0.5) * 100
     return {
-    "ETF": etf_symbol,
-    "Rendimiento Total (%)": round(rendimiento, 2),
-    "Riesgo (Desviación Estándar Anualizada) (%)": round(volatilidad, 2)
+        "ETF": etf_symbol,
+        "Rendimiento Total (%)": round(rendimiento, 2),
+        "Riesgo (Desviación Estándar Anualizada) (%)": round(volatilidad, 2)
     }, data['Close']
 
 # Resultados
@@ -159,8 +159,6 @@ with tabs[2]:
                 resultados_df = pd.DataFrame(resultados)
                 st.write("Resultados Comparativos de Rendimiento y Riesgo:")
                 st.table(resultados_df)
-            
-            
 
                 # Comparación de Escenarios
                 escenarios_dfs = []
@@ -170,12 +168,10 @@ with tabs[2]:
                     rendimiento_total = res["Rendimiento Total (%)"]
                     retorno_inversion = (monto_invertir * rendimiento_total) / 100
 
-                    # Escenarios
-                    rendimiento_optimista = rendimiento_total + 20
+                    # Escenarios usando los porcentajes seleccionados por el usuario
+                    rendimiento_optimista = rendimiento_total + porcentaje_optimista
                     rendimiento_neutro = rendimiento_total
-                    rendimiento_pesimista = rendimiento_total - 10
-
-        
+                    rendimiento_pesimista = rendimiento_total - porcentaje_pesimista
 
                     # Calcular retornos para cada escenario
                     escenarios_dfs.append({
@@ -190,7 +186,8 @@ with tabs[2]:
                         f"\n**{res['ETF']}**\n"
                         f"- Optimista: ${round((monto_invertir * rendimiento_optimista) / 100, 2)}\n"
                         f"- Neutro: ${round(retorno_inversion, 2)}\n"
-                        f"- Pesimista: ${round((monto_invertir * rendimiento_pesimista) / 100, 2)}\n")
+                        f"- Pesimista: ${round((monto_invertir * rendimiento_pesimista) / 100, 2)}\n"
+                    )
 
                 # Crear DataFrame para los escenarios y mostrar tabla
                 escenarios_df = pd.DataFrame(escenarios_dfs)
@@ -210,9 +207,9 @@ with tabs[2]:
                             res = resultados[etf_index]
                             cols[j].markdown(
                                 f"**{res['ETF']}**\n\n"
-                                f"- **Optimista**: ${round((monto_invertir * (res['Rendimiento Total (%)'] + 20)) / 100, 2)}\n"
+                                f"- **Optimista**: ${round((monto_invertir * (res['Rendimiento Total (%)'] + porcentaje_optimista)) / 100, 2)}\n"
                                 f"- **Neutro**: ${round((monto_invertir * res['Rendimiento Total (%)']) / 100, 2)}\n"
-                                f"- **Pesimista**: ${round((monto_invertir * (res['Rendimiento Total (%)'] - 10)) / 100, 2)}"
+                                f"- **Pesimista**: ${round((monto_invertir * (res['Rendimiento Total (%)'] - porcentaje_pesimista)) / 100, 2)}"
                             )
 
                 # Gráfico de los escenarios
@@ -222,7 +219,7 @@ with tabs[2]:
                     barmode="group", title="Comparación de Retornos Estimados por ETF y Escenario"
                 )
                 st.plotly_chart(fig_escenarios)
-                
+
                 # Gráfica de todos los precios de cierre en una sola gráfica
                 datos_graficos.reset_index(inplace=True)
                 datos_graficos = datos_graficos.melt(id_vars=["Date"], var_name="ETF", value_name="Precio de Cierre")
@@ -246,9 +243,9 @@ with tabs[2]:
                     labels={"Rendimiento Total (%)": "Rendimiento (%)"})
                 fig_rendimiento.update_layout(title_font=dict(size=20), title_x=0.5)
                 st.plotly_chart(fig_rendimiento)
-
             else:
-                st.write("No se encontraron datos para los ETFs seleccionados en el periodo elegido.")
+                st.write("No se encontraron resultados para los ETFs seleccionados.")
+
 
 
 
