@@ -68,7 +68,7 @@ with tabs[0]:
         st.session_state.pais_cliente = pais
         st.session_state.nacionalidad_cliente = nacionalidad
         st.session_state.ocupacion_cliente = ocupacion
-        st.session_state.pestaña_actual = 1  # Cambiar a la pestaña de "Análisis de ETFs"
+        
 
 
 # Análisis de ETFs (Pestaña 2)
