@@ -63,7 +63,7 @@ with tabs[0]:
             st.session_state.pais_cliente = ""
             st.session_state.nacionalidad_cliente = ""
             st.session_state.ocupacion_cliente = ""
-            st.experimental_rerun()  # Recargar la aplicación para reflejar los cambios
+            
     else:
         st.header("Información Personal del Cliente")
         nombre = st.text_input("Nombre:", value=st.session_state.get("nombre_cliente", ""))
