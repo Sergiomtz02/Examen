@@ -91,8 +91,7 @@ with tabs[0]:
             # Marcar que los datos han sido guardados
             st.session_state.datos_guardados = True
             
-            # Reiniciar la aplicación para reflejar el cambio
-            st.experimental_rerun()  
+  
 
 # Análisis de ETFs (Pestaña 2)
 with tabs[1]:
